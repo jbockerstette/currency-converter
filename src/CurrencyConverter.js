@@ -5,13 +5,15 @@ import {InputGroupAddon, InputGroup, Input} from "reactstrap";
 class CurrencyConverter extends React.Component {
   render() {
     const {symbol, longName, shortName, flag} = this.props.currency;
+    const {value, handleOnChange} = this.props;
     return (
       <div>
         <h5 className="float-left"><img className="flag" src={flag} alt="flag"/>
           {longName}</h5>
         <InputGroup className="my-input-group">
           <InputGroupAddon>{symbol}</InputGroupAddon>
-          <Input placeholder="Dolla dolla billz yo!"/>
+          <Input value={value} placeholder="Amount" type="number" step="1"
+                 onChange={(e) => handleOnChange(e.target.value)}/>
           <InputGroupAddon>{shortName}</InputGroupAddon>
         </InputGroup>
       </div>

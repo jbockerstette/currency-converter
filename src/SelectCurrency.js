@@ -4,16 +4,16 @@ import {DropdownItem, DropdownMenu, DropdownToggle, UncontrolledDropdown} from "
 
 class SelectCurrency extends React.Component {
   render() {
-    const {currencies} = this.props || ['testing'];
+    const {currencies, selectedCurrency, handleCurrencySelected} = this.props || [];
     return (
       <div className="row justify-content-center">
         <UncontrolledDropdown>
           <DropdownToggle caret>
-            Dropdown
+            {selectedCurrency}
           </DropdownToggle>
           <DropdownMenu>
             {currencies.map((currency) => {
-                return <DropdownItem>{currency}</DropdownItem>
+                return <DropdownItem key={currency} onClick={() => handleCurrencySelected(currency)}>{currency}</DropdownItem>
               }
             )}
           </DropdownMenu>

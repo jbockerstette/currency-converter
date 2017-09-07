@@ -3,10 +3,10 @@ import logo from '../src/images/cash-calculator.svg';
 import usd_flag from '../src/images/usd.png';
 import aud_flag from '../src/images/aud.png';
 import './App.css';
-import { Card,  CardTitle } from "reactstrap";
+import {Card, CardTitle} from "reactstrap";
 import SelectCurrency from "./SelectCurrency";
 import CurrencyConverter from "./CurrencyConverter";
-import { Map } from 'immutable';
+import {Map} from 'immutable';
 
 const CURRENCIES = Map({
   'Aus Dollars': {
@@ -29,22 +29,43 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      currencies: ['testing'],
+      currencies: CURRENCIES.keySeq().toArray(),
       leftCurrencyName: 'Aus Dollars',
       rightCurrencyName: 'US Dollars',
       conversionRate: 1.5,
       leftValue: 1,
-      rightValue: 1.5
+      rightValue: 1.5,
+      selectedCurrency: CURRENCIES.keySeq().toArray()[0]
     }
   }
 
-  handleSelectCurrency() {
-    console.log('handleSelectCurrency')
+  handleCurrencySelected(currencyName) {
+    this.setState({
+      selectedCurrency: currencyName
+    });
   }
+
+  handleOnChangeRight(newValue) {
+    const newLeftValue = newValue / this.state.conversionRate;
+    this.setState({
+      leftValue: newLeftValue,
+      rightValue: newValue
+    });
+  }
+
+  handleOnChangeLeft(newValue) {
+    const neRightValue = newValue * this.state.conversionRate;
+    this.setState({
+      leftValue: newValue,
+      rightValue: neRightValue
+    });
+  }
+
 
   render() {
     const {
-      currencies, leftCurrencyName, rightCurrencyName, conversionRate, leftValue, rightValue
+      currencies, leftCurrencyName, rightCurrencyName, conversionRate, leftValue, rightValue,
+      selectedCurrency
     } = this.state;
 
     const leftCurrency = CURRENCIES.get(leftCurrencyName);
@@ -60,18 +81,22 @@ class App extends React.Component {
           <div className="row justify-content-center">
             <CardTitle className="my-card-title">Select Currency</CardTitle>
           </div>
-          <SelectCurrency currencies={currencies}/>
+          <SelectCurrency selectedCurrency={selectedCurrency} currencies={currencies}
+                          handleCurrencySelected={this.handleCurrencySelected.bind(this)}/>
           <div className="row">
             <div className="col-6 my-col">
-              <CurrencyConverter currency={leftCurrency} value={leftValue}/>
+              <CurrencyConverter currency={leftCurrency} value={leftValue}
+                                 handleOnChange={this.handleOnChangeLeft.bind(this)}/>
             </div>
             <div className="col-6 my-col">
-              <CurrencyConverter currency={rightCurrency} value={rightValue}/>
+              <CurrencyConverter currency={rightCurrency} value={rightValue}
+                                 handleOnChange={this.handleOnChangeRight.bind(this)}/>
             </div>
           </div>
           <div className="row text-left">
             <div className="col-12 my-col-exchange-rate">
-              <b>Exchange Rate</b>
+              <b>Exchange
+                Rate </b> {`${leftCurrency.symbol} 1 ${leftCurrency.shortName} = ${rightCurrency.symbol} ${conversionRate} ${rightCurrency.shortName}`}
             </div>
           </div>
         </Card>
