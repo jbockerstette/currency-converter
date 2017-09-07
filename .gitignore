@@ -21,6 +21,3 @@ yarn-debug.log*
 yarn-error.log*
 
 .idea
-
-# css gets built automatically from the scss in the build-css script.
-src/**/*.css

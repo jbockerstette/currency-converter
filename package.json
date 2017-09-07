@@ -4,14 +4,15 @@
   "private": true,
   "dependencies": {
     "@types/react": "^16.0.5",
-    "bootstrap": "^3.3.7",
-    "bootstrap-sass": "^3.3.7",
+    "bootstrap": "4.0.0-alpha.6",
     "node-sass-chokidar": "0.0.3",
     "prop-types": "^15.5.10",
     "react": "^15.6.1",
-    "react-bootstrap": "^0.31.2",
+    "react-addons-css-transition-group": "^15.6.0",
+    "react-addons-transition-group": "^15.6.0",
     "react-dom": "^15.6.1",
-    "react-scripts": "1.0.13"
+    "react-scripts": "1.0.13",
+    "reactstrap": "^4.8.0"
   },
   "scripts": {
     "start": "react-scripts start",
