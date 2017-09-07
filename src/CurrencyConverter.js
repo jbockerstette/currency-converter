@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import {InputGroupAddon, InputGroup, Input} from "reactstrap";
 
 
@@ -20,6 +21,13 @@ class CurrencyConverter extends React.Component {
     );
   }
 }
+
+CurrencyConverter.propTypes = {
+  currency: PropTypes.object,
+  value: PropTypes.number,
+  handleOnChange: PropTypes.func
+};
+
 
 export default CurrencyConverter;
 

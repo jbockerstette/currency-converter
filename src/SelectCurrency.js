@@ -4,7 +4,7 @@ import {DropdownItem, DropdownMenu, DropdownToggle, UncontrolledDropdown} from "
 
 class SelectCurrency extends React.Component {
   render() {
-    const {currencies, selectedCurrency, handleCurrencySelected} = this.props || [];
+    const {currencies, selectedCurrency, handleCurrencySelected} = this.props;
     return (
       <div className="row justify-content-center">
         <UncontrolledDropdown>
@@ -13,7 +13,8 @@ class SelectCurrency extends React.Component {
           </DropdownToggle>
           <DropdownMenu>
             {currencies.map((currency) => {
-                return <DropdownItem key={currency} onClick={() => handleCurrencySelected(currency)}>{currency}</DropdownItem>
+                return <DropdownItem key={currency}
+                                     onClick={() => handleCurrencySelected(currency)}>{currency}</DropdownItem>
               }
             )}
           </DropdownMenu>
@@ -22,6 +23,12 @@ class SelectCurrency extends React.Component {
     );
   }
 }
+
+SelectCurrency.propTypes = {
+  selectedCurrency: PropTypes.string,
+  currencies: PropTypes.array,
+  handleCurrencySelected: PropTypes.func
+};
 
 export default SelectCurrency;
 

@@ -40,8 +40,15 @@ class App extends React.Component {
   }
 
   handleCurrencySelected(currencyName) {
+    const { leftValue } = this.state;
+    //TODO: Get the new conversion rate.
+    const newConversionRate = 5;
+    const newRightValue = leftValue * newConversionRate;
     this.setState({
-      selectedCurrency: currencyName
+      selectedCurrency: currencyName,
+      rightCurrencyName: currencyName,
+      conversionRate: newConversionRate,
+      rightValue: newRightValue
     });
   }
 
@@ -54,10 +61,10 @@ class App extends React.Component {
   }
 
   handleOnChangeLeft(newValue) {
-    const neRightValue = newValue * this.state.conversionRate;
+    const newRightValue = newValue * this.state.conversionRate;
     this.setState({
       leftValue: newValue,
-      rightValue: neRightValue
+      rightValue: newRightValue
     });
   }
 
