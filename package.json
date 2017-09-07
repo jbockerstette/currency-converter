@@ -5,6 +5,7 @@
   "dependencies": {
     "@types/react": "^16.0.5",
     "bootstrap": "4.0.0-alpha.6",
+    "immutable": "^3.8.1",
     "node-sass-chokidar": "0.0.3",
     "prop-types": "^15.5.10",
     "react": "^15.6.1",

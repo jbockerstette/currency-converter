@@ -1,23 +1,57 @@
-import React, {Component} from 'react';
+import React from 'react';
 import logo from '../src/images/cash-calculator.svg';
 import usd_flag from '../src/images/usd.png';
 import aud_flag from '../src/images/aud.png';
 import './App.css';
-import {
-  UncontrolledDropdown, DropdownItem, DropdownMenu, DropdownToggle, Card,
-  CardTitle, InputGroupAddon, InputGroup, Input
-} from "reactstrap";
+import { Card,  CardTitle } from "reactstrap";
+import SelectCurrency from "./SelectCurrency";
+import CurrencyConverter from "./CurrencyConverter";
+import { Map } from 'immutable';
 
-class App extends Component {
+const CURRENCIES = Map({
+  'Aus Dollars': {
+    symbol: '$',
+    longName: 'Aus Dollars',
+    shortName: 'AUD',
+    flag: aud_flag
+  },
+  'US Dollars': {
+    symbol: '$',
+    longName: 'US Dollars',
+    shortName: 'USD',
+    flag: usd_flag
+  }
+
+});
+
+class App extends React.Component {
 
   constructor(props) {
     super(props);
+    this.state = {
+      currencies: ['testing'],
+      leftCurrencyName: 'Aus Dollars',
+      rightCurrencyName: 'US Dollars',
+      conversionRate: 1.5,
+      leftValue: 1,
+      rightValue: 1.5
+    }
+  }
+
+  handleSelectCurrency() {
+    console.log('handleSelectCurrency')
   }
 
   render() {
+    const {
+      currencies, leftCurrencyName, rightCurrencyName, conversionRate, leftValue, rightValue
+    } = this.state;
+
+    const leftCurrency = CURRENCIES.get(leftCurrencyName);
+    const rightCurrency = CURRENCIES.get(rightCurrencyName);
+
     return (
       <div className="App">
-
         <Card className="my-card">
           <div className="App-header">
             <img src={logo} className="App-logo" alt="logo"/>
@@ -26,38 +60,13 @@ class App extends Component {
           <div className="row justify-content-center">
             <CardTitle className="my-card-title">Select Currency</CardTitle>
           </div>
-          <div className="row justify-content-center">
-            <UncontrolledDropdown>
-              <DropdownToggle caret>
-                Dropdown
-              </DropdownToggle>
-              <DropdownMenu>
-                <DropdownItem header>Header</DropdownItem>
-                <DropdownItem disabled>Action</DropdownItem>
-                <DropdownItem>Another Action</DropdownItem>
-                <DropdownItem divider/>
-                <DropdownItem>Another Action</DropdownItem>
-              </DropdownMenu>
-            </UncontrolledDropdown>
-          </div>
+          <SelectCurrency currencies={currencies}/>
           <div className="row">
             <div className="col-6 my-col">
-              <h5 className="float-left"><img className="flag" src={aud_flag} alt="flag"/>
-                Aus Dollars</h5>
-              <InputGroup className="my-input-group">
-                <InputGroupAddon>$</InputGroupAddon>
-                <Input placeholder="Dolla dolla billz yo!"/>
-                <InputGroupAddon>AUD</InputGroupAddon>
-              </InputGroup>
+              <CurrencyConverter currency={leftCurrency} value={leftValue}/>
             </div>
             <div className="col-6 my-col">
-              <h5 className="float-left"><img className="flag" src={usd_flag} alt="flag"/>
-                United States Dollars</h5>
-              <InputGroup className="my-input-group">
-                <InputGroupAddon>$</InputGroupAddon>
-                <Input placeholder="Dolla dolla billz yo!"/>
-                <InputGroupAddon>USD</InputGroupAddon>
-              </InputGroup>
+              <CurrencyConverter currency={rightCurrency} value={rightValue}/>
             </div>
           </div>
           <div className="row text-left">
