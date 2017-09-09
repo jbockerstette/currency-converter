@@ -2,11 +2,10 @@ import React from 'react';
 import {Map} from 'immutable';
 import logo from '../src/images/cash-calculator.svg';
 import usd_flag from '../src/images/usd.png';
-import aud_flag from '../src/images/aud.png';
 import './App.css';
 import SelectCurrency from "./SelectCurrency";
 import CurrencyConverter from "./CurrencyConverter";
-import {forOwn} from 'lodash';
+import {has} from 'lodash';
 
 
 const currencies = {};
@@ -32,8 +31,7 @@ class App extends React.Component {
       conversionRate: 1,
       leftValue: 1,
       rightValue: 1,
-      selectedCurrencyCode: 'USD',
-      isLoading: false,
+      selectedCurrencyCode: 'USD'
     }
   }
 
@@ -51,27 +49,31 @@ class App extends React.Component {
 
 
   fetchCountryData() {
-    fetch('https://restcountries.eu/rest/v2/all')
+    let currencyCodes;
+    fetch('http://api.fixer.io/latest')
+      .then(response => response.json())
+      .then(parsedJSON => parsedJSON.rates)
+      .then(rates => currencyCodes = rates)
+      .then(() => fetch('https://restcountries.eu/rest/v2/all'))
       .then(response => response.json())
       .then(parsedJSON => parsedJSON.forEach((country) => {
         const currency = country['currencies'][0];
-        if (currency) {
+        if (currency && has(currencyCodes, currency.code)) {
           currencies[currency.code] = {};
           Object.assign(currencies[currency.code], currency, {flag: country.flag});
           longToShortName[currency.name] = currency.code;
           shortToLongName[currency.code] = currency.name;
         }
       })).then(() => {
-        this.setState({
-          currenyNames: Object.keys(longToShortName),
-          isLoading: false
-        });
+      this.setState({
+        currenyNames: Object.keys(longToShortName)
+      });
     })
       .catch(error => console.log('parsing failed', error));
   }
 
   fetchRate(fromCurrencyCode, toCurrencyCode) {
-    const { leftValue } = this.state;
+    const {leftValue} = this.state;
 
     // fetch('http://api.fixer.io/latest?base=USD&symbols=USD,EUR')
     fetch(`http://api.fixer.io/latest?base=${fromCurrencyCode}&symbols=${toCurrencyCode}`)
@@ -90,7 +92,7 @@ class App extends React.Component {
   }
 
   handleCurrencySelected(longCurrencyName) {
-    const { leftCurrencyCode } = this.state;
+    const {leftCurrencyCode} = this.state;
     const selectedCode = this.toShortName(longCurrencyName);
     this.fetchRate(leftCurrencyCode, selectedCode);
     this.setState({
@@ -126,7 +128,9 @@ class App extends React.Component {
 
     console.log(leftCurrency);
 
-    if (!leftCurrency || !rightCurrency) { return null; }
+    if (!leftCurrency || !rightCurrency) {
+      return null;
+    }
 
     return (
       <div className="App">
@@ -137,7 +141,7 @@ class App extends React.Component {
         <div className="row justify-content-center">
           <h3 className="my-card-title">Select Currency</h3>
         </div>
-        <SelectCurrency selectedCurrency={leftCurrency.name} currencies={currenyNames}
+        <SelectCurrency selectedCurrency={rightCurrency.name} currencies={currenyNames}
                         handleCurrencySelected={this.handleCurrencySelected.bind(this)}/>
         <div className="row">
           <div className="col-sm-6 col-md-auto my-col">
