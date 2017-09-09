@@ -9,19 +9,9 @@ import CurrencyConverter from "./CurrencyConverter";
 import {forOwn} from 'lodash';
 
 
-const currencies = {
-  'USD': {
-    symbol: '$',
-    name: 'US Dollars',
-    code: 'USD',
-    flag: usd_flag,
-    rate: 1
-  }
-};
-
-const longToShortName = {
-  'US Dollars': 'USD'
-};
+const currencies = {};
+const longToShortName = {};
+const shortToLongName = {};
 
 const BASE_CURRENCY = {
   symbol: '$',
@@ -37,12 +27,12 @@ class App extends React.Component {
     super(props);
     this.state = {
       currenyNames: [],
-      leftCurrencyName: 'US Dollars',
-      rightCurrencyName: 'US Dollars',
+      leftCurrencyCode: 'USD',
+      rightCurrencyCode: 'USD',
       conversionRate: 1,
       leftValue: 1,
       rightValue: 1,
-      selectedCurrency: 'US Dollars',
+      selectedCurrencyCode: 'USD',
       isLoading: false,
     }
   }
@@ -51,15 +41,26 @@ class App extends React.Component {
     this.fetchCountryData();
   }
 
+  toShortName(longName) {
+    return longToShortName[longName];
+  }
+
+  toLongName(shortName) {
+    return shortToLongName[shortName];
+  }
+
 
   fetchCountryData() {
     fetch('https://restcountries.eu/rest/v2/all')
       .then(response => response.json())
       .then(parsedJSON => parsedJSON.forEach((country) => {
         const currency = country['currencies'][0];
-        currencies[currency.code] = {};
-        Object.assign(currencies[currency.code], currency);
-        longToShortName[currency.name] = currency.code;
+        if (currency) {
+          currencies[currency.code] = {};
+          Object.assign(currencies[currency.code], currency, {flag: country.flag});
+          longToShortName[currency.name] = currency.code;
+          shortToLongName[currency.code] = currency.name;
+        }
       })).then(() => {
         this.setState({
           currenyNames: Object.keys(longToShortName),
@@ -69,18 +70,16 @@ class App extends React.Component {
       .catch(error => console.log('parsing failed', error));
   }
 
-  fetchRate(fromCurrencyName, toCurrencyName) {
+  fetchRate(fromCurrencyCode, toCurrencyCode) {
     const { leftValue } = this.state;
-    const fromCurrency = this.getCurrency(fromCurrencyName);
-    const toCurrency = this.getCurrency(toCurrencyName);
 
     // fetch('http://api.fixer.io/latest?base=USD&symbols=USD,EUR')
-    fetch(`http://api.fixer.io/latest?base=${fromCurrency.code}&symbols=${toCurrency.code}`)
+    fetch(`http://api.fixer.io/latest?base=${fromCurrencyCode}&symbols=${toCurrencyCode}`)
       .then(response => response.json())
       .then(parsedJSON => {
-        let rate = 0;
-        if (toCurrencyName !== fromCurrencyName) {
-          rate = parsedJSON.rates[toCurrency.code];
+        let rate = 1;
+        if (toCurrencyCode !== fromCurrencyCode && parsedJSON.rates) {
+          rate = parsedJSON.rates[toCurrencyCode];
         }
         console.log(rate);
         this.setState({
@@ -90,12 +89,13 @@ class App extends React.Component {
       }).catch(error => console.log('parsing failed', error));
   }
 
-  handleCurrencySelected(currencyName) {
-    const { leftCurrencyName } = this.state;
-    this.fetchRate(leftCurrencyName, currencyName);
+  handleCurrencySelected(longCurrencyName) {
+    const { leftCurrencyCode } = this.state;
+    const selectedCode = this.toShortName(longCurrencyName);
+    this.fetchRate(leftCurrencyCode, selectedCode);
     this.setState({
-      selectedCurrency: currencyName,
-      rightCurrencyName: currencyName
+      selectedCurrencyCode: selectedCode,
+      rightCurrencyCode: selectedCode
     });
   }
 
@@ -115,21 +115,18 @@ class App extends React.Component {
     });
   }
 
-  getCurrency(longName) {
-    return currencies[longToShortName[longName]];
-  }
-
 
   render() {
     const {
-      currenyNames, leftCurrencyName, rightCurrencyName, conversionRate, leftValue, rightValue,
-      selectedCurrency
+      currenyNames, leftCurrencyCode, rightCurrencyCode, conversionRate, leftValue, rightValue
     } = this.state;
 
-    const leftCurrency = this.getCurrency(leftCurrencyName);
-    const rightCurrency = this.getCurrency(rightCurrencyName);
+    const leftCurrency = currencies[leftCurrencyCode];
+    const rightCurrency = currencies[rightCurrencyCode];
 
     console.log(leftCurrency);
+
+    if (!leftCurrency || !rightCurrency) { return null; }
 
     return (
       <div className="App">
@@ -140,7 +137,7 @@ class App extends React.Component {
         <div className="row justify-content-center">
           <h3 className="my-card-title">Select Currency</h3>
         </div>
-        <SelectCurrency selectedCurrency={selectedCurrency} currencies={currenyNames}
+        <SelectCurrency selectedCurrency={leftCurrency.name} currencies={currenyNames}
                         handleCurrencySelected={this.handleCurrencySelected.bind(this)}/>
         <div className="row">
           <div className="col-sm-6 col-md-auto my-col">
@@ -155,7 +152,8 @@ class App extends React.Component {
         <div className="row text-left">
           <div className="col-12 my-col-exchange-rate">
             <b>Exchange
-              Rate </b> {`${leftCurrency.symbol} 1 ${leftCurrency.code} = ${rightCurrency.symbol} ${conversionRate} ${rightCurrency.code}`}
+              Rate </b> {`${leftCurrency.symbol} 1 ${leftCurrency.code} = ${rightCurrency.symbol}
+              ${conversionRate} ${rightCurrency.code}`}
           </div>
         </div>
       </div>
