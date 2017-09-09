@@ -1,10 +1,8 @@
 import React from 'react';
-import {Map} from 'immutable';
 import logo from '../src/images/cash-calculator.svg';
-import usd_flag from '../src/images/usd.png';
-import './App.css';
-import SelectCurrency from "./SelectCurrency";
-import CurrencyConverter from "./CurrencyConverter";
+import './scss/App.css';
+import SelectCurrency from "./components/SelectCurrency";
+import CurrencyConverter from "./components/CurrencyConverter";
 import {has} from 'lodash';
 
 
@@ -12,13 +10,6 @@ const currencies = {};
 const longToShortName = {};
 const shortToLongName = {};
 
-const BASE_CURRENCY = {
-  symbol: '$',
-  name: 'US Dollars',
-  code: 'USD',
-  flag: usd_flag,
-  rate: 1
-};
 
 class App extends React.Component {
 
@@ -28,9 +19,9 @@ class App extends React.Component {
       currenyNames: [],
       leftCurrencyCode: 'USD',
       rightCurrencyCode: 'USD',
-      conversionRate: 1,
-      leftValue: 1,
-      rightValue: 1,
+      conversionRate: 1.00,
+      leftValue: 1.00,
+      rightValue: 1.00,
       selectedCurrencyCode: 'USD'
     }
   }
@@ -102,7 +93,7 @@ class App extends React.Component {
   }
 
   handleOnChangeRight(newValue) {
-    const newLeftValue = newValue / this.state.conversionRate;
+    const newLeftValue = this.round(newValue / this.state.conversionRate);
     this.setState({
       leftValue: newLeftValue,
       rightValue: newValue
@@ -110,13 +101,17 @@ class App extends React.Component {
   }
 
   handleOnChangeLeft(newValue) {
-    const newRightValue = newValue * this.state.conversionRate;
+    const newRightValue = this.round(newValue * this.state.conversionRate);
     this.setState({
       leftValue: newValue,
       rightValue: newRightValue
     });
   }
 
+  round(value) {
+    const num = typeof value === 'string' ? Number.parseFloat(value) : value;
+    return num.toFixed(2);
+  };
 
   render() {
     const {
