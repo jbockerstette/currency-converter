@@ -11,7 +11,7 @@ const currency = {
 
 
 
-test('CurrencyConverter changes the text after click', () => {
+test('CurrencyConverter renders the props correctly', () => {
   const handleOnChange = (value) => {
     expect(value).toEqual(1);
   };

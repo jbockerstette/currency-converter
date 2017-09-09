@@ -38,6 +38,15 @@ class App extends React.Component {
     return shortToLongName[shortName];
   }
 
+  addCurrency(currency) {
+    if (currency && has(currencyCodes, currency.code)) {
+      currencies[currency.code] = {};
+      Object.assign(currencies[currency.code], currency, {flag: country.flag});
+      longToShortName[currency.name] = currency.code;
+      shortToLongName[currency.code] = currency.name;
+    }
+  }
+
 
   fetchCountryData() {
     let currencyCodes;
@@ -74,7 +83,6 @@ class App extends React.Component {
         if (toCurrencyCode !== fromCurrencyCode && parsedJSON.rates) {
           rate = parsedJSON.rates[toCurrencyCode];
         }
-        console.log(rate);
         this.setState({
           rightValue: leftValue * rate,
           conversionRate: rate
