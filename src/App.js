@@ -7,7 +7,6 @@ import {has} from 'lodash';
 
 
 let longToShortName = {'US Dollars': 'USD'};
-let shortToLongName = {'USD':'US Dollars'};
 
 
 class App extends React.Component {
@@ -30,7 +29,6 @@ class App extends React.Component {
     this.fetchCurrencyRates().then((currencies) => {
       this.currencies = currencies;
       longToShortName = this.getNameMap(Object.values(this.currencies), 'name', 'code');
-      shortToLongName = this.getNameMap(Object.values(this.currencies), 'code', 'name');
       this.setState({
         currencyNames: Object.keys(longToShortName)
       });
@@ -38,11 +36,10 @@ class App extends React.Component {
   }
 
   toShortName(longName) {
-    return longToShortName[longName];
-  }
-
-  toLongName(shortName) {
-    return shortToLongName[shortName];
+    if (has(longToShortName, longName)) {
+      return longToShortName[longName];
+    }
+    return '???';
   }
 
   getNameMap(currencies, from, to) {
@@ -82,30 +79,28 @@ class App extends React.Component {
   }
 
   fetchRate(fromCurrencyCode, toCurrencyCode) {
-    const {leftValue} = this.state;
-
     // fetch('http://api.fixer.io/latest?base=USD&symbols=USD,EUR')
-    fetch(`http://api.fixer.io/latest?base=${fromCurrencyCode}&symbols=${toCurrencyCode}`)
+    return fetch(`http://api.fixer.io/latest?base=${fromCurrencyCode}&symbols=${toCurrencyCode}`)
       .then(response => response.json())
       .then(parsedJSON => {
         let rate = 1;
         if (toCurrencyCode !== fromCurrencyCode && parsedJSON.rates) {
           rate = parsedJSON.rates[toCurrencyCode];
         }
-        this.setState({
-          rightValue: leftValue * rate,
-          conversionRate: rate
-        });
+        return rate;
       }).catch(error => console.log('parsing failed', error));
   }
 
   handleCurrencySelected(longCurrencyName) {
-    const {leftCurrencyCode} = this.state;
+    const {leftCurrencyCode, leftValue} = this.state;
     const selectedCode = this.toShortName(longCurrencyName);
-    this.fetchRate(leftCurrencyCode, selectedCode);
-    this.setState({
-      selectedCurrencyCode: selectedCode,
-      rightCurrencyCode: selectedCode
+    this.fetchRate(leftCurrencyCode, selectedCode).then((rate) => {
+      this.setState({
+        rightValue: this.round(leftValue * rate),
+        conversionRate: rate,
+        selectedCurrencyCode: selectedCode,
+        rightCurrencyCode: selectedCode
+      });
     });
   }
 
@@ -127,7 +122,7 @@ class App extends React.Component {
 
   round(value) {
     const num = typeof value === 'string' ? Number.parseFloat(value) : value;
-    return num.toFixed(2);
+    return Number.parseFloat(num.toFixed(2));
   };
 
   render() {
@@ -137,8 +132,6 @@ class App extends React.Component {
 
     const leftCurrency = this.currencies[leftCurrencyCode];
     const rightCurrency = this.currencies[rightCurrencyCode];
-
-    console.log(leftCurrency);
 
     if (!leftCurrency || !rightCurrency) {
       return null;
