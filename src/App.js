@@ -6,7 +6,6 @@ import CurrencyConverter from "./components/CurrencyConverter";
 import {has} from 'lodash';
 
 
-const currencies = {};
 const longToShortName = {};
 const shortToLongName = {};
 
@@ -23,11 +22,12 @@ class App extends React.Component {
       leftValue: 1.00,
       rightValue: 1.00,
       selectedCurrencyCode: 'USD'
-    }
+    };
+    this.currencies = {};
   }
 
   componentWillMount() {
-    this.fetchCountryData();
+    this.fetchRates();
   }
 
   toShortName(longName) {
@@ -38,29 +38,18 @@ class App extends React.Component {
     return shortToLongName[shortName];
   }
 
-  addCurrency(currency) {
-    if (currency && has(currencyCodes, currency.code)) {
-      currencies[currency.code] = {};
-      Object.assign(currencies[currency.code], currency, {flag: country.flag});
-      longToShortName[currency.name] = currency.code;
-      shortToLongName[currency.code] = currency.name;
-    }
-  }
 
-
-  fetchCountryData() {
+  fetchRates() {
     let currencyCodes;
     fetch('http://api.fixer.io/latest')
       .then(response => response.json())
       .then(parsedJSON => parsedJSON.rates)
       .then(rates => currencyCodes = rates)
-      .then(() => fetch('https://restcountries.eu/rest/v2/all'))
-      .then(response => response.json())
-      .then(parsedJSON => parsedJSON.forEach((country) => {
-        const currency = country['currencies'][0];
+      .then(() => this.fetchCurrencies())
+      .then(currencies => currencies.forEach((currency) => {
         if (currency && has(currencyCodes, currency.code)) {
-          currencies[currency.code] = {};
-          Object.assign(currencies[currency.code], currency, {flag: country.flag});
+          this.currencies[currency.code] = {};
+          Object.assign(this.currencies[currency.code], currency);
           longToShortName[currency.name] = currency.code;
           shortToLongName[currency.code] = currency.name;
         }
@@ -69,6 +58,21 @@ class App extends React.Component {
         currenyNames: Object.keys(longToShortName)
       });
     })
+      .catch(error => console.log('parsing failed', error));
+  }
+
+  fetchCurrencies() {
+    const currencies = [];
+    return fetch('https://restcountries.eu/rest/v2/all')
+      .then(response => response.json())
+      .then(parsedJSON => parsedJSON.forEach((country) => {
+        const currency = country['currencies'][0];
+        if (currency) {
+          const newCurrency = {};
+          Object.assign(newCurrency, currency, {flag: country.flag});
+          currencies.push(newCurrency);
+        }
+      })).then(() => currencies)
       .catch(error => console.log('parsing failed', error));
   }
 
@@ -126,8 +130,8 @@ class App extends React.Component {
       currenyNames, leftCurrencyCode, rightCurrencyCode, conversionRate, leftValue, rightValue
     } = this.state;
 
-    const leftCurrency = currencies[leftCurrencyCode];
-    const rightCurrency = currencies[rightCurrencyCode];
+    const leftCurrency = this.currencies[leftCurrencyCode];
+    const rightCurrency = this.currencies[rightCurrencyCode];
 
     console.log(leftCurrency);
 
