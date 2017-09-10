@@ -3,7 +3,7 @@ import logo from '../src/images/cash-calculator.svg';
 import './scss/App.css';
 import SelectCurrency from "./components/SelectCurrency";
 import CurrencyConverter from "./components/CurrencyConverter";
-import {has} from 'lodash';
+import {has, values} from 'lodash';
 
 
 let longToShortName = {'US Dollars': 'USD'};
@@ -28,7 +28,7 @@ class App extends React.Component {
   componentWillMount() {
     this.fetchCurrencyRates().then((currencies) => {
       this.currencies = currencies;
-      longToShortName = this.getNameMap(Object.values(this.currencies), 'name', 'code');
+      longToShortName = this.getNameMap(values(this.currencies), 'name', 'code');
       this.setState({
         currencyNames: Object.keys(longToShortName)
       });
