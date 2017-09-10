@@ -13,10 +13,21 @@ describe('Testing App component', () => {
   });
 });
 
-describe('Testing App methods', () => {
-  it('renders without crashing', () => {
-    const div = document.createElement('div');
-    ReactDOM.render(<App/>, div);
+describe('getLongToShortCurrencyNameMap method', () => {
+  it('should produce a long to short name lookup object', () => {
+    const currencies = [
+      {
+        name: 'US Dollars',
+        code: 'USD'
+      },
+      {
+        name: 'Aussy Dollars',
+        code: 'AUD'
+      },
+      ];
+    const longToShort = App.prototype.getNameMap(currencies, 'name', 'code');
+    expect(longToShort['US Dollars']).toEqual('USD');
+    expect(longToShort['Aussy Dollars']).toEqual('AUD');
   });
 });
 

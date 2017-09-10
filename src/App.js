@@ -6,8 +6,8 @@ import CurrencyConverter from "./components/CurrencyConverter";
 import {has} from 'lodash';
 
 
-const longToShortName = {};
-const shortToLongName = {};
+let longToShortName = {'US Dollars': 'USD'};
+let shortToLongName = {'USD':'US Dollars'};
 
 
 class App extends React.Component {
@@ -15,7 +15,7 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      currenyNames: [],
+      currencyNames: [],
       leftCurrencyCode: 'USD',
       rightCurrencyCode: 'USD',
       conversionRate: 1.00,
@@ -27,7 +27,14 @@ class App extends React.Component {
   }
 
   componentWillMount() {
-    this.fetchRates();
+    this.fetchCurrencyRates().then((currencies) => {
+      this.currencies = currencies;
+      longToShortName = this.getNameMap(Object.values(this.currencies), 'name', 'code');
+      shortToLongName = this.getNameMap(Object.values(this.currencies), 'code', 'name');
+      this.setState({
+        currencyNames: Object.keys(longToShortName)
+      });
+    }).catch(error => console.log('parsing failed', error));
   }
 
   toShortName(longName) {
@@ -38,27 +45,26 @@ class App extends React.Component {
     return shortToLongName[shortName];
   }
 
+  getNameMap(currencies, from, to) {
+    return currencies.reduce((longNameToShortName, currency) =>
+      Object.assign(longNameToShortName, {[currency[from]]: currency[to]}), {});
+  }
 
-  fetchRates() {
+
+  fetchCurrencyRates() {
     let currencyCodes;
-    fetch('http://api.fixer.io/latest')
+    let currencyRates = {};
+    return fetch('http://api.fixer.io/latest')
       .then(response => response.json())
       .then(parsedJSON => parsedJSON.rates)
       .then(rates => currencyCodes = rates)
       .then(() => this.fetchCurrencies())
       .then(currencies => currencies.forEach((currency) => {
         if (currency && has(currencyCodes, currency.code)) {
-          this.currencies[currency.code] = {};
-          Object.assign(this.currencies[currency.code], currency);
-          longToShortName[currency.name] = currency.code;
-          shortToLongName[currency.code] = currency.name;
+          currencyRates[currency.code] = {};
+          Object.assign(currencyRates[currency.code], currency);
         }
-      })).then(() => {
-      this.setState({
-        currenyNames: Object.keys(longToShortName)
-      });
-    })
-      .catch(error => console.log('parsing failed', error));
+      })).then(() => currencyRates);
   }
 
   fetchCurrencies() {
@@ -68,12 +74,11 @@ class App extends React.Component {
       .then(parsedJSON => parsedJSON.forEach((country) => {
         const currency = country['currencies'][0];
         if (currency) {
-          const newCurrency = {};
-          Object.assign(newCurrency, currency, {flag: country.flag});
-          currencies.push(newCurrency);
+          const nextCurrency = {};
+          Object.assign(nextCurrency, currency, {flag: country.flag});
+          currencies.push(nextCurrency);
         }
-      })).then(() => currencies)
-      .catch(error => console.log('parsing failed', error));
+      })).then(() => currencies);
   }
 
   fetchRate(fromCurrencyCode, toCurrencyCode) {
@@ -127,7 +132,7 @@ class App extends React.Component {
 
   render() {
     const {
-      currenyNames, leftCurrencyCode, rightCurrencyCode, conversionRate, leftValue, rightValue
+      currencyNames, leftCurrencyCode, rightCurrencyCode, conversionRate, leftValue, rightValue
     } = this.state;
 
     const leftCurrency = this.currencies[leftCurrencyCode];
@@ -148,7 +153,7 @@ class App extends React.Component {
         <div className="row justify-content-center">
           <h3 className="my-card-title">Select Currency</h3>
         </div>
-        <SelectCurrency selectedCurrency={rightCurrency.name} currencies={currenyNames}
+        <SelectCurrency selectedCurrency={rightCurrency.name} currencies={currencyNames}
                         handleCurrencySelected={this.handleCurrencySelected.bind(this)}/>
         <div className="row">
           <div className="col-sm-6 col-md-auto my-col">
