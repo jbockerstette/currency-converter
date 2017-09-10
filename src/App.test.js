@@ -87,5 +87,23 @@ describe('round method', () => {
 });
 
 
+test('CurrencyConverter renders the props correctly', () => {
+  const handleOnChange = (value) => {
+    expect(value).toEqual(1);
+  };
+  fetch.mockResponseOnce(JSON.stringify(mock_responses.countryCodes));
+  fetch.mockResponseOnce(JSON.stringify(mock_responses.countryData));
+
+  // Render a CurrencyConverter
+  const wrapper = shallow(
+    <App/>
+  );
+
+  expect(wrapper.find('h2').text()).toEqual('US Dollars');
+  // expect(wrapper.find('InputGroupAddon').at(0).children().text()).toEqual('$');
+  // expect(wrapper.find('InputGroupAddon').at(1).children().text()).toEqual('USD');
+  // wrapper.find('Input').simulate('change', {target:{value:1}});
+
+});
 
 
