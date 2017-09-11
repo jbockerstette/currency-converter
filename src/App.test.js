@@ -89,24 +89,51 @@ describe('round method', () => {
   });
 });
 
+describe('handleCurrencySelected method', () => {
+  const component = shallow(<App/>);
+  it('should set the state properly', (done) => {
+    fetch.resetMocks();
+    fetch.mockResponseOnce(JSON.stringify(mock_responses.rates));
+    component.instance().setState = (state) => {
+      const {rightValue, conversionRate, selectedCurrencyCode, rightCurrencyCode} = state;
+      expect(rightValue).toEqual(.83);
+      expect(conversionRate).toEqual(.82919);
+      expect(selectedCurrencyCode).toEqual('EUR');
+      expect(rightCurrencyCode).toEqual('EUR');
+      done();
+    };
+    component.instance().handleCurrencySelected('Euro');
+  });
+});
 
-// test('CurrencyConverter renders the props correctly', () => {
-//   const handleOnChange = (value) => {
-//     expect(value).toEqual(1);
-//   };
-//   fetch.mockResponseOnce(JSON.stringify(mock_responses.countryCodes));
-//   fetch.mockResponseOnce(JSON.stringify(mock_responses.countryData));
-//
-//   // Render a CurrencyConverter
-//   // const wrapper = shallow(
-//     {/*<App/>*/}
-//   // );
-//   //
-//   // expect(wrapper.find('h2').text()).toEqual('US Dollars');
-//   // expect(wrapper.find('InputGroupAddon').at(0).children().text()).toEqual('$');
-//   // expect(wrapper.find('InputGroupAddon').at(1).children().text()).toEqual('USD');
-//   // wrapper.find('Input').simulate('change', {target:{value:1}});
-//
-// });
+describe('handleOnChangeRight method', () => {
+  const component = shallow(<App/>);
+  it('should set the state properly', (done) => {
+    fetch.resetMocks();
+    fetch.mockResponseOnce(JSON.stringify(mock_responses.rates));
+    component.instance().setState = (state) => {
+      const {rightValue, leftValue} = state;
+      expect(rightValue).toEqual(2);
+      expect(leftValue).toEqual(2);
+      done();
+    };
+    component.instance().handleOnChangeRight(2);
+  });
+});
+
+describe('handleOnChangeLeft method', () => {
+  const component = shallow(<App/>);
+  it('should set the state properly', (done) => {
+    fetch.resetMocks();
+    fetch.mockResponseOnce(JSON.stringify(mock_responses.rates));
+    component.instance().setState = (state) => {
+      const {rightValue, leftValue} = state;
+      expect(rightValue).toEqual(4);
+      expect(leftValue).toEqual(4);
+      done();
+    };
+    component.instance().handleOnChangeLeft(4);
+  });
+});
 
 

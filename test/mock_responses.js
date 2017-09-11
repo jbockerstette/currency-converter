@@ -1,6 +1,6 @@
 module.exports = {
   countryCodes: {
-    "base": "EUR",
+    "base": "USD",
     "date": "2017-09-08",
     "rates": {
       "AUD": 1.4881,
@@ -11,6 +11,7 @@ module.exports = {
       "CNY": 7.7926,
       "CZK": 26.099,
       "DKK": 7.4402,
+      "EUR": 0.82919,
       "GBP": 0.91268,
       "HKD": 9.416,
       "HRK": 7.4315,
@@ -32,7 +33,7 @@ module.exports = {
       "SGD": 1.6124,
       "THB": 39.919,
       "TRY": 4.1191,
-      "USD": 1.206,
+      "USD": 1.0000,
       "ZAR": 15.512
     }
   },
