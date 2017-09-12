@@ -1,5 +1,7 @@
 import React from 'react';
 import logo from '../src/images/cash-calculator.svg';
+import react_logo from '../src/images/react.svg';
+import redux_logo from '../src/images/redux.svg';
 import './scss/App.css';
 import SelectCurrency from "./components/SelectCurrency";
 import CurrencyConverter from "./components/CurrencyConverter";
@@ -141,7 +143,9 @@ class App extends React.Component {
     return (
       <div className="App">
         <div className="App-header">
+          <img src={react_logo} className="libs-logo" alt="logo"/>
           <img src={logo} className="App-logo" alt="logo"/>
+          <img src={redux_logo} className="libs-logo" alt="logo"/>
           <h2>Currency Converter</h2>
         </div>
         <div className="row justify-content-center">

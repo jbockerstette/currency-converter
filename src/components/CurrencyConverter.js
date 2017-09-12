@@ -8,7 +8,7 @@ function CurrencyConverter(props) {
   const {value, handleOnChange} = props;
   return (
     <div>
-      <h5 className="float-left"><img className="flag" src={flag} alt="flag"/>
+      <h5 className="float-left"><img className="img-thumbnail flag" src={flag} alt="flag"/>
         {name}</h5>
       <InputGroup className="my-input-group">
         <InputGroupAddon>{symbol}</InputGroupAddon>
