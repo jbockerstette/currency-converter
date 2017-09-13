@@ -1,4 +1,5 @@
 import React from 'react';
+import {Map} from 'immutable';
 import logo from '../src/images/cash-calculator.svg';
 import react_logo from '../src/images/react.svg';
 import redux_logo from '../src/images/redux.svg';
@@ -7,7 +8,7 @@ import SelectCurrency from "./components/SelectCurrency";
 import CurrencyConverter from "./components/CurrencyConverter";
 import {has, values} from 'lodash';
 import {
-  setCurrencyNames, setCurrencySelected, setRightCurrency,
+  setCurrencies, setCurrencySelected, setRightCurrency,
   setValues
 } from "./actions/actions";
 
@@ -15,7 +16,7 @@ import {
 let longToShortName = {'US Dollars': 'USD'};
 
 export const DEFAULT_STATE = {
-  currencyNames: [],
+  currencies: Map(),
   leftCurrencyCode: 'USD',
   rightCurrencyCode: 'USD',
   conversionRate: 1.00,
@@ -31,7 +32,6 @@ class App extends React.Component {
     super(props);
     this.state = DEFAULT_STATE;
     this.store = props.store;
-    this.currencies = {};
     this.store.subscribe(() => {
       this.setState(this.store.getState());
     });
@@ -39,9 +39,8 @@ class App extends React.Component {
 
   componentWillMount() {
     this.fetchCurrencyRates().then((currencies) => {
-      this.currencies = currencies;
-      longToShortName = this.getNameMap(values(this.currencies), 'name', 'code');
-      this.store.dispatch(setCurrencyNames(Object.keys(longToShortName)));
+      longToShortName = this.getNameMap(values(currencies), 'name', 'code');
+      this.store.dispatch(setCurrencies(currencies));
     }).catch(error => console.log('parsing failed', error));
   }
 
@@ -81,9 +80,7 @@ class App extends React.Component {
       .then(parsedJSON => parsedJSON.forEach((country) => {
         const currency = country['currencies'][0];
         if (currency) {
-          const nextCurrency = {};
-          Object.assign(nextCurrency, currency, {flag: country.flag});
-          currencies.push(nextCurrency);
+          currencies.push(Object.assign({}, currency, {flag: country.flag}));
         }
       })).then(() => currencies);
   }
@@ -128,13 +125,13 @@ class App extends React.Component {
 
   render() {
     const {
-      currencyNames, leftCurrencyCode, rightCurrencyCode, conversionRate, leftValue, rightValue,
+      currencies, leftCurrencyCode, rightCurrencyCode, conversionRate, leftValue, rightValue,
       selectedCurrencyCode
     } = this.state;
 
-    const leftCurrency = this.currencies[leftCurrencyCode];
-    const rightCurrency = this.currencies[rightCurrencyCode];
-    const selectedCurrency = this.currencies[selectedCurrencyCode];
+    const leftCurrency = currencies.get(leftCurrencyCode);
+    const rightCurrency = currencies.get(rightCurrencyCode);
+    const selectedCurrency = currencies.get(selectedCurrencyCode);
 
     if (!leftCurrency || !rightCurrency) {
       return null;
@@ -151,7 +148,9 @@ class App extends React.Component {
         <div className="row justify-content-center">
           <h3 className="my-card-title">Select Currency</h3>
         </div>
-        <SelectCurrency selectedCurrency={selectedCurrency.name} currencies={currencyNames}
+        <SelectCurrency selectedCurrency={selectedCurrency.name}
+                        currencies={currencies}
+                        flag={selectedCurrency.flag}
                         handleCurrencySelected={this.handleCurrencySelected.bind(this)}/>
         <div className="row">
           <div className="col-sm-6 col-md-auto my-col">

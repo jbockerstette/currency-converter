@@ -1,11 +1,12 @@
+import {Map} from 'immutable';
 import {ACTION} from "../actions/actions";
 import {DEFAULT_STATE} from "../App";
 
 
 export default function reducer(state = DEFAULT_STATE, action) {
   switch (action.type) {
-    case ACTION.SET_CURRENCY_NAMES: {
-      return Object.assign({}, state, {currencyNames: action.currencyNames});
+    case ACTION.SET_CURRENCIES: {
+      return Object.assign({}, state, {currencies: Map(action.currencies)});
     }
     case ACTION.CHANGE_RIGHT_CURRENCY: {
       return Object.assign({}, state, {rightCurrencyCode: action.code});
