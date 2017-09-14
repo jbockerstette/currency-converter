@@ -30,10 +30,11 @@ class SelectCurrency extends React.Component {
       <div className="row justify-content-center">
         <Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggle}>
           <DropdownToggle caret>
+            <img className="img-thumbnail flag" src={this.props.flag} alt="flag"/>
             {selectedCurrency}
           </DropdownToggle>
           <DropdownMenu>
-            {currencies.valueSeq().map((currency) => {
+            {currencies.valueSeq().sortBy(c => c.name).map((currency) => {
                 return <div key={currency.name}
                             onClick={() => this.handleOnClick(currency.name)}>
                   <img className="img-thumbnail flag" src={currency.flag} alt="flag"/>{currency.name}
@@ -50,6 +51,7 @@ class SelectCurrency extends React.Component {
 SelectCurrency.propTypes = {
   selectedCurrency: PropTypes.string,
   currencies: PropTypes.object,
+  flag: PropTypes.object,
   handleCurrencySelected: PropTypes.func
 };
 

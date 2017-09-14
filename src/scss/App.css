@@ -4,6 +4,7 @@
 }
 
 .my-input-group {
+  margin: 4px;
   width: 100%;
 }
 
@@ -12,6 +13,7 @@
 }
 
 .my-col-exchange-rate {
+  margin: 4px;
   padding-left: 32px;
 }
 
@@ -21,7 +23,8 @@
 
 .flag {
   height: 32px;
-  margin-right: 8px;
+  margin: 4px;
+  width: 48px;
 }
 
 .App-logo {
