@@ -2,9 +2,13 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
 import {shallow} from 'enzyme';
+import {createStore} from "redux";
+import {Map} from 'immutable';
+import reducer from "./reducers/reducer";
 
 global.fetch = require('jest-fetch-mock');
 const mock_responses = require('../test/mock_responses');
+
 
 beforeEach(() => {
   fetch.mockResponseOnce(JSON.stringify(mock_responses.countryCodes));
@@ -13,46 +17,38 @@ beforeEach(() => {
 
 
 describe('Testing App component', () => {
+  const store = createStore(reducer);
+  store.dispatch({type:''});
   it('renders without crashing', () => {
     const div = document.createElement('div');
-    ReactDOM.render(<App/>, div);
+    ReactDOM.render(<App store={store}/>, div);
   });
 });
 
 describe('getNameMap method', () => {
   it('should produce a long to short name lookup object', () => {
-    const currencies = [
+    const currencies = Map(
       {
-        name: 'US Dollars',
-        code: 'USD'
-      },
-      {
-        name: 'Aussy Dollars',
-        code: 'AUD'
-      },
-      ];
-    const longToShort = App.prototype.getNameMap(currencies, 'name', 'code');
-    expect(longToShort['US Dollars']).toEqual('USD');
-    expect(longToShort['Aussy Dollars']).toEqual('AUD');
-  });
-});
-
-describe('toShortName method', () => {
-  it('should produce a short name for the long name', () => {
-    const short = App.prototype.toShortName('United States dollar');
-    expect(short).toEqual('USD');
-  });
-  it('should produce a ??? for the long name not found', () => {
-    const short = App.prototype.toShortName('XXXXX');
-    expect(short).toEqual('???');
+        USD: Map({
+          name: 'US Dollars',
+          code: 'USD'
+        }),
+        AUD: Map({
+          name: 'Aussy Dollars',
+          code: 'AUD'
+        })
+      });
+    const longToShort = App.prototype.getNameMap(Array.from(currencies.values()), 'name', 'code');
+    expect(longToShort.get('US Dollars')).toEqual('USD');
+    expect(longToShort.get('Aussy Dollars')).toEqual('AUD');
   });
 });
 
 describe('fetchCurrencyRates method', () => {
   it('should fetch my mocks', () => {
     App.prototype.fetchCurrencyRates().then((rates) => {
-      expect(rates.AUD.code).toEqual('AUD');
-      expect(rates.USD.name).toEqual('United States dollar');
+      expect(rates.getIn(['AUD','code'])).toEqual('AUD');
+      expect(rates.getIn(['USD', 'name'])).toEqual('United States dollar');
     })
   });
 });
@@ -62,8 +58,8 @@ describe('fetchCurrencies method', () => {
     fetch.resetMocks();
     fetch.mockResponseOnce(JSON.stringify(mock_responses.countryData));
     App.prototype.fetchCurrencies().then((currencies) => {
-      expect(currencies.filter(c => c.code === 'USD').length).toBeGreaterThan(1);
-      expect(currencies.filter(c => c.code === 'AUD').length).toBeGreaterThan(1);
+      expect(currencies.filter(c => c.code === 'USD').size).toBeGreaterThan(1);
+      expect(currencies.filter(c => c.code === 'AUD').size).toBeGreaterThan(1);
     })
   });
 });
@@ -72,7 +68,7 @@ describe('fetchRate method', () => {
   it('should fetch my mocks', () => {
     fetch.resetMocks();
     fetch.mockResponseOnce(JSON.stringify(mock_responses.rates));
-    App.prototype.fetchRate('USD', 'EUR').then((rate) => {
+    App.prototype.fetchRate('USD', 'AUD').then((rate) => {
       expect(rate).toEqual(0.82919);
     })
   });
@@ -90,29 +86,44 @@ describe('round method', () => {
 });
 
 describe('handleCurrencySelected method', () => {
-  const component = shallow(<App/>);
+  const store = createStore(reducer);
+  store.dispatch({type:''});
+  fetch.resetMocks();
+  fetch.mockResponseOnce(JSON.stringify(mock_responses.countryCodes));
+  fetch.mockResponseOnce(JSON.stringify(mock_responses.countryData));
+  let skipStateChange = 0;
+  const component = shallow(<App store={store}/>);
   it('should set the state properly', (done) => {
     fetch.resetMocks();
     fetch.mockResponseOnce(JSON.stringify(mock_responses.rates));
     component.instance().setState = (state) => {
-      const {rightValue, conversionRate, selectedCurrencyCode, rightCurrencyCode} = state;
-      expect(rightValue).toEqual(.83);
-      expect(conversionRate).toEqual(.82919);
-      expect(selectedCurrencyCode).toEqual('EUR');
-      expect(rightCurrencyCode).toEqual('EUR');
-      done();
+      // You have to skip some dispatches of the state change before we get to the final one.
+      if (skipStateChange === 2) {
+        const {rightValue, conversionRate, selectedCurrencyCode, rightCurrencyCode} = state.data.toJS();
+        expect(rightValue).toEqual(.83);
+        expect(conversionRate).toEqual(.82919);
+        expect(selectedCurrencyCode).toEqual('AUD');
+        expect(rightCurrencyCode).toEqual('AUD');
+        done();
+      }
+      skipStateChange++;
     };
-    component.instance().handleCurrencySelected('Euro');
+    component.instance().handleCurrencySelected('Australian dollar');
   });
 });
 
 describe('handleOnChangeRight method', () => {
-  const component = shallow(<App/>);
+  const store = createStore(reducer);
+  store.dispatch({type:''});
+  fetch.resetMocks();
+  fetch.mockResponseOnce(JSON.stringify(mock_responses.countryCodes));
+  fetch.mockResponseOnce(JSON.stringify(mock_responses.countryData));
+  const component = shallow(<App store={store}/>);
   it('should set the state properly', (done) => {
     fetch.resetMocks();
     fetch.mockResponseOnce(JSON.stringify(mock_responses.rates));
     component.instance().setState = (state) => {
-      const {rightValue, leftValue} = state;
+      const {rightValue, leftValue} = state.data.toJS();
       expect(rightValue).toEqual(2);
       expect(leftValue).toEqual(2);
       done();
@@ -122,12 +133,17 @@ describe('handleOnChangeRight method', () => {
 });
 
 describe('handleOnChangeLeft method', () => {
-  const component = shallow(<App/>);
+  const store = createStore(reducer);
+  store.dispatch({type:''});
+  fetch.resetMocks();
+  fetch.mockResponseOnce(JSON.stringify(mock_responses.countryCodes));
+  fetch.mockResponseOnce(JSON.stringify(mock_responses.countryData));
+  const component = shallow(<App store={store}/>);
   it('should set the state properly', (done) => {
     fetch.resetMocks();
     fetch.mockResponseOnce(JSON.stringify(mock_responses.rates));
     component.instance().setState = (state) => {
-      const {rightValue, leftValue} = state;
+      const {rightValue, leftValue} = state.data.toJS();
       expect(rightValue).toEqual(4);
       expect(leftValue).toEqual(4);
       done();

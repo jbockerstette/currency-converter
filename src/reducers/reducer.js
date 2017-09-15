@@ -6,22 +6,22 @@ import {DEFAULT_STATE} from "../App";
 export default function reducer(state = DEFAULT_STATE, action) {
   switch (action.type) {
     case ACTION.SET_CURRENCIES: {
-      return Object.assign({}, state, {currencies: Map(action.currencies)});
+      return state.merge({currencies: Map(action.currencies)});
     }
     case ACTION.CHANGE_RIGHT_CURRENCY: {
-      return Object.assign({}, state, {rightCurrencyCode: action.code});
+      return state.merge({rightCurrencyCode: action.code});
     }
     case ACTION.CHANGE_LEFT_CURRENCY: {
-      return Object.assign({}, state, {leftCurrencyCode: action.code});
+      return state.merge({leftCurrencyCode: action.code});
     }
     case ACTION.CHANGE_CONVERSION_RATE: {
-      return Object.assign({}, state, {conversionRate: action.rate});
+      return state.merge({conversionRate: action.rate});
     }
     case ACTION.CHANGE_VALUES: {
-      return Object.assign({}, state, {leftValue: action.leftValue, rightValue: action.rightValue});
+      return state.merge({leftValue: action.leftValue, rightValue: action.rightValue});
     }
     case ACTION.CHANGE_SELECTED_CURRENCY: {
-      return Object.assign({}, state, {selectedCurrencyCode: action.code,
+      return state.merge({selectedCurrencyCode: action.code,
         conversionRate: action.rate});
     }
     default:

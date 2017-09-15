@@ -1,13 +1,14 @@
 import React from 'react';
 import {shallow} from 'enzyme';
+import {Map} from 'immutable';
 import CurrencyConverter from './CurrencyConverter';
 
-const currency = {
+const currency = Map({
   symbol: '$',
   name: 'US Dollars',
   code: 'USD',
   flag: 'flag.png'
-};
+});
 
 
 

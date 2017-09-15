@@ -3,7 +3,7 @@ module.exports = {
     "base": "USD",
     "date": "2017-09-08",
     "rates": {
-      "AUD": 1.4881,
+      "AUD": 0.82919,
       "BGN": 1.9558,
       "BRL": 3.7256,
       "CAD": 1.4577,
@@ -19104,7 +19104,7 @@ module.exports = {
     "base": "USD",
     "date": "2017-09-08",
     "rates": {
-      "EUR": 0.82919
+      "AUD": 0.82919
     }
   }
 };

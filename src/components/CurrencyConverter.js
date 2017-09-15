@@ -4,7 +4,7 @@ import {InputGroupAddon, InputGroup, Input} from "reactstrap";
 
 
 function CurrencyConverter(props) {
-  const {symbol, name, code, flag} = props.currency;
+  const {symbol, name, code, flag} = props.currency.toJS();
   const {value, handleOnChange} = props;
   return (
     <div>

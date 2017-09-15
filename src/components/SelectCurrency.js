@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {DropdownMenu, DropdownToggle, Dropdown} from "reactstrap";
 
-// const {currencies, selectedCurrency, handleCurrencySelected} = props;
 
 class SelectCurrency extends React.Component {
   constructor(props) {
@@ -25,19 +24,19 @@ class SelectCurrency extends React.Component {
   };
 
   render() {
-    const {currencies, selectedCurrency} = this.props;
+    const {currencies, selectedCurrency, flag} = this.props;
     return (
       <div className="row justify-content-center">
         <Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggle}>
           <DropdownToggle caret>
-            <img className="img-thumbnail flag" src={this.props.flag} alt="flag"/>
+            <img className="img-thumbnail flag" src={flag} alt="flag"/>
             {selectedCurrency}
           </DropdownToggle>
           <DropdownMenu>
-            {currencies.valueSeq().sortBy(c => c.name).map((currency) => {
-                return <div key={currency.name}
-                            onClick={() => this.handleOnClick(currency.name)}>
-                  <img className="img-thumbnail flag" src={currency.flag} alt="flag"/>{currency.name}
+            {currencies.valueSeq().sortBy(c => c.get('name')).map((currency) => {
+                return <div key={currency.get('name')}
+                            onClick={() => this.handleOnClick(currency.get('name'))}>
+                  <img className="img-thumbnail flag" src={currency.get('flag')} alt="flag"/>{currency.get('name')}
                 </div>
               }
             )}
@@ -51,7 +50,7 @@ class SelectCurrency extends React.Component {
 SelectCurrency.propTypes = {
   selectedCurrency: PropTypes.string,
   currencies: PropTypes.object,
-  flag: PropTypes.object,
+  flag: PropTypes.string,
   handleCurrencySelected: PropTypes.func
 };
 

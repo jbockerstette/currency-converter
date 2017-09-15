@@ -1,21 +1,21 @@
 import React from 'react';
-import {Map} from 'immutable';
+import {Map, List, fromJS} from 'immutable';
 import logo from '../src/images/cash-calculator.svg';
 import react_logo from '../src/images/react.svg';
 import redux_logo from '../src/images/redux.svg';
 import './scss/App.css';
 import SelectCurrency from "./components/SelectCurrency";
 import CurrencyConverter from "./components/CurrencyConverter";
-import {has, values} from 'lodash';
+import {has} from 'lodash';
 import {
   setCurrencies, setCurrencySelected, setRightCurrency,
   setValues
 } from "./actions/actions";
 
 
-let longToShortName = {'US Dollars': 'USD'};
+let longToShortName = Map({'US Dollars': 'USD'});
 
-export const DEFAULT_STATE = {
+export const DEFAULT_STATE = Map({
   currencies: Map(),
   leftCurrencyCode: 'USD',
   rightCurrencyCode: 'USD',
@@ -23,39 +23,41 @@ export const DEFAULT_STATE = {
   leftValue: 1.00,
   rightValue: 1.00,
   selectedCurrencyCode: 'USD'
-};
+});
 
 
 class App extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = DEFAULT_STATE;
+    this.state = {data: DEFAULT_STATE};
     this.store = props.store;
     this.store.subscribe(() => {
-      this.setState(this.store.getState());
+      const state = this.store.getState();
+      this.setState({data: state});
     });
   }
 
   componentWillMount() {
     this.fetchCurrencyRates().then((currencies) => {
-      longToShortName = this.getNameMap(values(currencies), 'name', 'code');
+      longToShortName = this.getNameMap(Array.from(currencies.values()), 'name', 'code');
       this.store.dispatch(setCurrencies(currencies));
     }).catch(error => console.log('parsing failed', error));
   }
 
   toShortName(longName) {
-    if (has(longToShortName, longName)) {
-      return longToShortName[longName];
+    if (longToShortName.has(longName)) {
+      return longToShortName.get(longName);
     }
     return '???';
   }
 
-  getNameMap(currencies, from, to) {
-    return currencies.reduce((longNameToShortName, currency) =>
-      Object.assign(longNameToShortName, {[currency[from]]: currency[to]}), {});
-  }
 
+  getNameMap(currencies, from, to) {
+    return Map(currencies.reduce((longNameToShortName, currency) => {
+      return Object.assign(longNameToShortName, {[currency.get(from)]: currency.get(to)});
+    }, {}));
+  }
 
   fetchCurrencyRates() {
     let currencyCodes;
@@ -70,7 +72,7 @@ class App extends React.Component {
           currencyRates[currency.code] = {};
           Object.assign(currencyRates[currency.code], currency);
         }
-      })).then(() => currencyRates);
+      })).then(() => fromJS(currencyRates));
   }
 
   fetchCurrencies() {
@@ -82,7 +84,7 @@ class App extends React.Component {
         if (currency) {
           currencies.push(Object.assign({}, currency, {flag: country.flag}));
         }
-      })).then(() => currencies);
+      })).then(() => List(currencies));
   }
 
   fetchRate(fromCurrencyCode, toCurrencyCode) {
@@ -99,7 +101,9 @@ class App extends React.Component {
   }
 
   handleCurrencySelected(longCurrencyName) {
-    const {leftCurrencyCode, leftValue} = this.state;
+    const data = this.state.data;
+    const leftCurrencyCode = data.get('leftCurrencyCode');
+    const leftValue = data.get('leftValue');
     const selectedCode = this.toShortName(longCurrencyName);
     this.fetchRate(leftCurrencyCode, selectedCode).then((rate) => {
       this.store.dispatch(setCurrencySelected(selectedCode, rate));
@@ -108,14 +112,14 @@ class App extends React.Component {
     });
   }
 
-  handleOnChangeRight(newValue) {
-    const newLeftValue = this.round(newValue / this.state.conversionRate);
-    this.store.dispatch(setValues(newLeftValue, newValue));
+  handleOnChangeRight(newRightValue) {
+    const newLeftValue = this.round(newRightValue / this.state.data.get('conversionRate'));
+    this.store.dispatch(setValues(newLeftValue, newRightValue));
   }
 
-  handleOnChangeLeft(newValue) {
-    const newRightValue = this.round(newValue * this.state.conversionRate);
-    this.store.dispatch(setValues(newValue, newRightValue));
+  handleOnChangeLeft(newLeftValue) {
+    const newRightValue = this.round(newLeftValue * this.state.data.get('conversionRate'));
+    this.store.dispatch(setValues(newLeftValue, newRightValue));
   }
 
   round(value) {
@@ -124,11 +128,14 @@ class App extends React.Component {
   };
 
   render() {
-    const {
-      currencies, leftCurrencyCode, rightCurrencyCode, conversionRate, leftValue, rightValue,
-      selectedCurrencyCode
-    } = this.state;
-
+    const data = this.state.data;
+    const currencies = data.get('currencies');
+    const leftCurrencyCode = data.get('leftCurrencyCode');
+    const leftValue = data.get('leftValue');
+    const rightCurrencyCode = data.get('rightCurrencyCode');
+    const rightValue = data.get('rightValue');
+    const conversionRate = data.get('conversionRate');
+    const selectedCurrencyCode = data.get('selectedCurrencyCode');
     const leftCurrency = currencies.get(leftCurrencyCode);
     const rightCurrency = currencies.get(rightCurrencyCode);
     const selectedCurrency = currencies.get(selectedCurrencyCode);
@@ -148,9 +155,9 @@ class App extends React.Component {
         <div className="row justify-content-center">
           <h3 className="my-card-title">Select Currency</h3>
         </div>
-        <SelectCurrency selectedCurrency={selectedCurrency.name}
+        <SelectCurrency selectedCurrency={selectedCurrency.get('name')}
                         currencies={currencies}
-                        flag={selectedCurrency.flag}
+                        flag={selectedCurrency.get('flag')}
                         handleCurrencySelected={this.handleCurrencySelected.bind(this)}/>
         <div className="row">
           <div className="col-sm-6 col-md-auto my-col">
@@ -165,8 +172,8 @@ class App extends React.Component {
         <div className="row text-left">
           <div className="col-12 my-col-exchange-rate">
             <b>Exchange
-              Rate </b> {`${leftCurrency.symbol} 1 ${leftCurrency.code} = ${rightCurrency.symbol}
-              ${conversionRate} ${rightCurrency.code}`}
+              Rate </b> {`${leftCurrency.get('symbol')} 1 ${leftCurrency.get('code')} = ${rightCurrency.get('symbol')}
+              ${conversionRate} ${rightCurrency.get('code')}`}
           </div>
         </div>
       </div>
