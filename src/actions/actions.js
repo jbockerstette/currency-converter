@@ -3,7 +3,7 @@ export const ACTION = {
   CHANGE_RIGHT_CURRENCY: 'ACTION_CHANGE_RIGHT_CURRENCY',
   CHANGE_LEFT_CURRENCY: 'ACTION_CHANGE_LEFT_CURRENCY',
   CHANGE_CONVERSION_RATE: 'ACTION_CHANGE_CONVERSION_RATE',
-  CHANGE_VALUES: 'ACTION_CHANGE_LEFT_VALUE',
+  CHANGE_VALUES: 'ACTION_CHANGE_VALUES',
   CHANGE_SELECTED_CURRENCY: 'ACTION_CHANGE_SELECTED_CURRENCY',
 };
 
@@ -33,6 +33,13 @@ export function setValues(leftValue, rightValue) {
 export function setRightCurrency(code) {
   return {
     type: ACTION.CHANGE_RIGHT_CURRENCY,
+    code
+  }
+}
+
+export function setLeftCurrency(code) {
+  return {
+    type: ACTION.CHANGE_LEFT_CURRENCY,
     code
   }
 }

@@ -4,11 +4,10 @@ import logo from '../src/images/cash-calculator.svg';
 import react_logo from '../src/images/react.svg';
 import redux_logo from '../src/images/redux.svg';
 import './scss/App.css';
-import SelectCurrency from "./components/SelectCurrency";
 import CurrencyConverter from "./components/CurrencyConverter";
 import {has} from 'lodash';
 import {
-  setCurrencies, setCurrencySelected, setRightCurrency,
+  setCurrencies, setCurrencySelected, setLeftCurrency, setRightCurrency,
   setValues
 } from "./actions/actions";
 
@@ -100,7 +99,19 @@ class App extends React.Component {
       }).catch(error => console.log('parsing failed', error));
   }
 
-  handleCurrencySelected(longCurrencyName) {
+  handleCurrencySelectedLeft(longCurrencyName) {
+    const data = this.state.data;
+    const rightCurrencyCode = data.get('rightCurrencyCode');
+    const rightValue = data.get('rightValue');
+    const selectedCode = this.toShortName(longCurrencyName);
+    this.fetchRate(selectedCode, rightCurrencyCode).then((rate) => {
+      this.store.dispatch(setCurrencySelected(selectedCode, rate));
+      this.store.dispatch(setValues(this.round(rightValue / rate), rightValue));
+      this.store.dispatch(setLeftCurrency(selectedCode));
+    });
+  }
+
+  handleCurrencySelectedRight(longCurrencyName) {
     const data = this.state.data;
     const leftCurrencyCode = data.get('leftCurrencyCode');
     const leftValue = data.get('leftValue');
@@ -135,10 +146,8 @@ class App extends React.Component {
     const rightCurrencyCode = data.get('rightCurrencyCode');
     const rightValue = data.get('rightValue');
     const conversionRate = data.get('conversionRate');
-    const selectedCurrencyCode = data.get('selectedCurrencyCode');
     const leftCurrency = currencies.get(leftCurrencyCode);
     const rightCurrency = currencies.get(rightCurrencyCode);
-    const selectedCurrency = currencies.get(selectedCurrencyCode);
 
     if (!leftCurrency || !rightCurrency) {
       return null;
@@ -152,21 +161,22 @@ class App extends React.Component {
           <img src={redux_logo} className="libs-logo" alt="logo"/>
           <h2>Currency Converter</h2>
         </div>
-        <div className="row justify-content-center">
-          <h3 className="my-card-title">Select Currency</h3>
-        </div>
-        <SelectCurrency selectedCurrency={selectedCurrency.get('name')}
-                        currencies={currencies}
-                        flag={selectedCurrency.get('flag')}
-                        handleCurrencySelected={this.handleCurrencySelected.bind(this)}/>
         <div className="row">
           <div className="col-sm-6 col-md-auto my-col">
-            <CurrencyConverter currency={leftCurrency} value={leftValue}
-                               handleOnChange={this.handleOnChangeLeft.bind(this)}/>
+            <CurrencyConverter currency={leftCurrency}
+                               value={leftValue}
+                               handleOnChange={this.handleOnChangeLeft.bind(this)}
+                               handleCurrencySelected={this.handleCurrencySelectedLeft.bind(this)}
+                               currencies={currencies}
+            />
           </div>
           <div className="col-sm-6 col-md-auto my-col">
-            <CurrencyConverter currency={rightCurrency} value={rightValue}
-                               handleOnChange={this.handleOnChangeRight.bind(this)}/>
+            <CurrencyConverter currency={rightCurrency}
+                               value={rightValue}
+                               handleOnChange={this.handleOnChangeRight.bind(this)}
+                               handleCurrencySelected={this.handleCurrencySelectedRight.bind(this)}
+                               currencies={currencies}
+            />
           </div>
         </div>
         <div className="row text-left">

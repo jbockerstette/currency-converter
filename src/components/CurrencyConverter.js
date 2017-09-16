@@ -1,15 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {InputGroupAddon, InputGroup, Input} from "reactstrap";
+import SelectCurrency from "./SelectCurrency";
 
 
 function CurrencyConverter(props) {
   const {symbol, name, code, flag} = props.currency.toJS();
-  const {value, handleOnChange} = props;
+  const {value, handleOnChange, handleCurrencySelected, currencies} = props;
   return (
     <div>
-      <h5 className="float-left"><img className="img-thumbnail flag" src={flag} alt="flag"/>
-        {name}</h5>
+      <SelectCurrency selectedCurrency={name}
+                      currencies={currencies}
+                      flag={flag}
+                      handleCurrencySelected={handleCurrencySelected}/>
       <InputGroup className="my-input-group">
         <InputGroupAddon>{symbol}</InputGroupAddon>
         <Input value={value} placeholder="Amount" type="number" step="1"
@@ -23,7 +26,9 @@ function CurrencyConverter(props) {
 CurrencyConverter.propTypes = {
   currency: PropTypes.object,
   value: PropTypes.any,
-  handleOnChange: PropTypes.func
+  handleOnChange: PropTypes.func,
+  handleCurrencySelected: PropTypes.func,
+  currencies: PropTypes.object,
 };
 
 
