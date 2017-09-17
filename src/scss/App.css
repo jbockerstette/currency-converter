@@ -12,6 +12,10 @@
   width: 100%;
 }
 
+.btn {
+  padding: 0px 4px;
+}
+
 
 .flag {
   height: 32px;

@@ -49,7 +49,7 @@ class ImageListDropDown extends React.Component {
 }
 
 ImageListDropDown.propTypes = {
-  selectedItem: PropTypes.shape({name:PropTypes.string, imageSrc:PropTypes.string}),
+  selectedItem: PropTypes.shape({name: PropTypes.string, imageSrc: PropTypes.string}),
   items: PropTypes.instanceOf(List),
   handleSelection: PropTypes.func
 };
