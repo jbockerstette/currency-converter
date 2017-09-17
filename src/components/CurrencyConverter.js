@@ -1,22 +1,26 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {InputGroupAddon, InputGroup, Input} from "reactstrap";
-import SelectCurrency from "./SelectCurrency";
+import ImageListDropDown from "./ImageListDropDown";
+import {List} from "immutable";
 
 
 function CurrencyConverter(props) {
   const {symbol, name, code, flag} = props.currency.toJS();
   const {value, handleOnChange, handleCurrencySelected, currencies} = props;
+  const items = List(currencies.valueSeq().map(currency => Object.assign({}, {
+    name: currency.get('name'),
+    imageSrc: currency.get('flag')
+  })));
   return (
     <div>
-      <SelectCurrency selectedCurrency={name}
-                      currencies={currencies}
-                      flag={flag}
-                      handleCurrencySelected={handleCurrencySelected}/>
+      <ImageListDropDown selectedItem={{name, imageSrc: flag}}
+                         items={items}
+                         handleSelection={handleCurrencySelected}/>
       <InputGroup className="my-input-group">
         <InputGroupAddon>{symbol}</InputGroupAddon>
         <Input value={value} placeholder="Amount" type="number" step="1"
-               onChange= {(e) => handleOnChange(e.target.value)}/>
+               onChange={(e) => handleOnChange(e.target.value)}/>
         <InputGroupAddon>{code}</InputGroupAddon>
       </InputGroup>
     </div>

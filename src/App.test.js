@@ -85,7 +85,7 @@ describe('round method', () => {
   });
 });
 
-describe('handleCurrencySelected method', () => {
+describe('handleSelection method', () => {
   const store = createStore(reducer);
   store.dispatch({type:''});
   fetch.resetMocks();
@@ -108,7 +108,7 @@ describe('handleCurrencySelected method', () => {
       }
       skipStateChange++;
     };
-    component.instance().handleCurrencySelected('Australian dollar');
+    component.instance().handleSelection('Australian dollar');
   });
 });
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import {shallow} from 'enzyme';
 import {Map} from 'immutable';
-import SelectCurrency from './SelectCurrency';
+import ImageListDropDown from './ImageListDropDown';
 
 const currencies = Map({
   USD: Map({
@@ -18,13 +18,13 @@ const currencies = Map({
   }),
 });
 
-test('SelectCurrency renders the props correctly', () => {
+test('ImageListDropDown renders the props correctly', () => {
   const handleCurrencySelected = (value) => {
     expect(value).toEqual('Canadian Dollars');
   };
-  // Render a SelectCurrency
+  // Render a ImageListDropDown
   const wrapper = shallow(
-    <SelectCurrency selectedCurrency="US Dollars" currencies={currencies} handleCurrencySelected={handleCurrencySelected} />
+    <ImageListDropDown selectedCurrency="US Dollars" currencies={currencies} handleCurrencySelected={handleCurrencySelected} />
   );
 
   expect(wrapper.find('DropdownToggle').children().at(1).text()).toEqual('US Dollars');
