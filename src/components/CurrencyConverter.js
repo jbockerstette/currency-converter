@@ -17,7 +17,7 @@ function CurrencyConverter(props) {
       <ImageListDropDown selectedItem={{name, imageSrc: flag}}
                          items={items}
                          handleSelection={handleCurrencySelected}/>
-      <InputGroup className="my-input-group">
+      <InputGroup>
         <InputGroupAddon>{symbol}</InputGroupAddon>
         <Input value={value} placeholder="Amount" type="number" step="1"
                onChange={(e) => handleOnChange(e.target.value)}/>

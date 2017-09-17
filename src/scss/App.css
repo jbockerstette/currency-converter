@@ -3,9 +3,8 @@
   text-align: center;
 }
 
-.my-input-group {
-  margin: 4px;
-  width: 100%;
+.my-row {
+  text-align: left;
 }
 
 .my-col {
@@ -13,12 +12,7 @@
 }
 
 .my-col-exchange-rate {
-  margin: 4px;
   padding-left: 32px;
-}
-
-.my-card-title {
-  margin-top: 32px;
 }
 
 .flag {

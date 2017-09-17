@@ -161,7 +161,7 @@ class App extends React.Component {
           <img src={redux_logo} className="libs-logo" alt="logo"/>
           <h2>Currency Converter</h2>
         </div>
-        <div className="row">
+        <div className="row my-row">
           <div className="col-sm-6 col-md-auto my-col">
             <CurrencyConverter currency={leftCurrency}
                                value={leftValue}
@@ -179,7 +179,7 @@ class App extends React.Component {
             />
           </div>
         </div>
-        <div className="row text-left">
+        <div className="row my-row">
           <div className="col-12 my-col-exchange-rate">
             <b>Exchange
               Rate </b> {`${leftCurrency.get('symbol')} 1 ${leftCurrency.get('code')} = ${rightCurrency.get('symbol')}
