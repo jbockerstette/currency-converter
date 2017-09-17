@@ -14,15 +14,19 @@ function CurrencyConverter(props) {
   })));
   return (
     <div>
+      <div className="my-row">
       <ImageListDropDown selectedItem={{name, imageSrc: flag}}
                          items={items}
                          handleSelection={handleCurrencySelected}/>
+      </div>
+      <div className="my-row">
       <InputGroup>
         <InputGroupAddon>{symbol}</InputGroupAddon>
         <Input value={value} placeholder="Amount" type="number" step="1"
                onChange={(e) => handleOnChange(e.target.value)}/>
         <InputGroupAddon>{code}</InputGroupAddon>
       </InputGroup>
+    </div>
     </div>
   );
 }

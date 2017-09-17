@@ -5,15 +5,13 @@
 
 .my-row {
   text-align: left;
+  padding: 4px;
 }
 
-.my-col {
-  padding: 32px;
+.my-input-group {
+  width: 100%;
 }
 
-.my-col-exchange-rate {
-  padding-left: 32px;
-}
 
 .flag {
   height: 32px;

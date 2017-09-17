@@ -27,7 +27,7 @@ class ImageListDropDown extends React.Component {
   render() {
     const {items, selectedItem} = this.props;
     return (
-      <div className="float-left">
+      <div>
         <Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggle}>
           <DropdownToggle caret>
             <img className="img-thumbnail flag" src={selectedItem.imageSrc} alt="flag"/>

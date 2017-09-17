@@ -162,7 +162,7 @@ class App extends React.Component {
           <h2>Currency Converter</h2>
         </div>
         <div className="row my-row">
-          <div className="col-sm-6 col-md-auto my-col">
+          <div className="col-sm-6 col-md-auto">
             <CurrencyConverter currency={leftCurrency}
                                value={leftValue}
                                handleOnChange={this.handleOnChangeLeft.bind(this)}
@@ -170,7 +170,7 @@ class App extends React.Component {
                                currencies={currencies}
             />
           </div>
-          <div className="col-sm-6 col-md-auto my-col">
+          <div className="col-sm-6 col-md-auto">
             <CurrencyConverter currency={rightCurrency}
                                value={rightValue}
                                handleOnChange={this.handleOnChangeRight.bind(this)}
@@ -180,10 +180,12 @@ class App extends React.Component {
           </div>
         </div>
         <div className="row my-row">
-          <div className="col-12 my-col-exchange-rate">
-            <b>Exchange
-              Rate </b> {`${leftCurrency.get('symbol')} 1 ${leftCurrency.get('code')} = ${rightCurrency.get('symbol')}
+          <div className="col-sm-12">
+            <div className="my-row">
+              <b>Exchange
+                Rate </b> {`${leftCurrency.get('symbol')} 1 ${leftCurrency.get('code')} = ${rightCurrency.get('symbol')}
               ${conversionRate} ${rightCurrency.get('code')}`}
+            </div>
           </div>
         </div>
       </div>
